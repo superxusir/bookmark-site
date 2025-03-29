@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浮生的储物袋</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --light-bg: #f5f7fa;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --hover-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #ecf0f3;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8ef 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 顶部Banner样式 */
+        .banner {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .banner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%234682b4' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        .banner-title {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            display: inline-block;
+        }
+
+        .banner-title i {
+            margin-right: 15px;
+            font-size: 2.5rem;
+            vertical-align: middle;
+            color: #ecf0f1;
+        }
+
+        .banner-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* 搜索框样式 */
+        .search-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            background-color: rgba(255,255,255,0.9);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        /* 快捷工具栏 */
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px auto;
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--primary-color);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .quick-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .quick-link i {
+            margin-right: 10px;
+            font-size: 20px;
+            color: var(--secondary-color);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        /* 分类卡片 */
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .card-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        .card-header i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        /* 链接样式 */
+        .site-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .site-link:last-child {
+            margin-bottom: 0;
+        }
+
+        .site-link:hover {
+            transform: translateX(5px);
+        }
+
+        .site-link i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .hot-badge {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* 分类颜色 */
+        .learn-bg {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        .learn-link {
+            background-color: #e3f2fd;
+        }
+        .learn-link:hover {
+            background-color: #bbdefb;
+        }
+        .learn-link i {
+            color: #2980b9;
+        }
+
+        .book-bg {
+            background: linear-gradient(135deg, #27ae60, #16a085);
+        }
+        .book-link {
+            background-color: #e8f5e9;
+        }
+        .book-link:hover {
+            background-color: #c8e6c9;
+        }
+        .book-link i {
+            color: #16a085;
+        }
+
+        .magazine-bg {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        .magazine-link {
+            background-color: #f3e5f5;
+        }
+        .magazine-link:hover {
+            background-color: #e1bee7;
+        }
+        .magazine-link i {
+            color: #8e44ad;
+        }
+
+        .tool-bg {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+        .tool-link {
+            background-color: #fff3e0;
+        }
+        .tool-link:hover {
+            background-color: #ffe0b2;
+        }
+        .tool-link i {
+            color: #d35400;
+        }
+
+        .video-bg {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        .video-link {
+            background-color: #ffebee;
+        }
+        .video-link:hover {
+            background-color: #ffcdd2;
+        }
+        .video-link i {
+            color: #c0392b;
+        }
+
+        .misc-bg {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+        }
+        .misc-link {
+            background-color: #eceff1;
+        }
+        .misc-link:hover {
+            background-color: #cfd8dc;
+        }
+        .misc-link i {
+            color: #34495e;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            .banner-title {
+                font-size: 2.2rem;
+            }
+            .quick-nav {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .banner-title {
+                font-size: 1.8rem;
+            }
+            .card-header h2 {
+                font-size: 1.2rem;
+            }
+            .quick-link {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner区域 -->
+    <header class="banner">
+        <h1 class="banner-title"><i class="fas fa-box-archive"></i>浮生的储物袋</h1>
+        <p class="banner-subtitle">精心收藏的网络宝藏，为您的信息探索之旅提供导航</p>
+        <div class="search-wrapper">
+            <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索资源...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+    </header>
+
+    <!-- 快捷导航 -->
+    <div class="quick-nav">
+        <a href="https://www2.jiumodiary.com/" class="quick-link">
+            <i class="fas fa-book-open"></i>鸠摩搜书
+        </a>
+        <a href="https://www.w3cschool.cn/sql/" class="quick-link">
+            <i class="fas fa-database"></i>SQL教程
+        </a>
+        <a href="https://uutool.cn/" class="quick-link">
+            <i class="fas fa-tools"></i>UU工具
+        </a>
+        <a href="https://sobooks.cc/" class="quick-link">
+            <i class="fas fa-book"></i>SoBooks
+        </a>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="container">
+        <!-- 学习资源 -->
+        <section class="category-card">
+            <div class="card-header learn-bg">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>学习资源</h2>
+            </div>
+            <div class="card-content">
+                <a href="https://www.icourses.cn/home/" class="site-link learn-link">
+                    <i class="fas fa-chalkboard-teacher"></i>爱课程
+                </a>
+                <a href="https://fishc.com.cn/forum.php?mod=forumdisplay&fid=360&mobile=2" class="site-link learn-link">
+                    <i class="fas fa-code"></i>鱼C论坛
+                </a>
+                <a href="https://www.w3cschool.cn/sql/" class="site-link learn-link">
+                    <i class="fas fa-database"></i>W3Cschool SQL教程
+                    <span class="hot-badge">热门</span>
+                </a>
+                <a href="https://le.ouchn.cn/home" class="site-link learn-link">
+                    <i class="fas fa-university"></i>国家开放大学学习网
+                </a>
+            </div>
+        </section>
+
+        <!-- 电子书籍 -->
+        <section class="category-card">
+            <div class="card-header book-bg">
+                <i class="fas fa-book"></i>
+                <h2>电子书籍</h2>
+            </div>
+            <div class="card-content">
+                <a href="https://sobooks.cc/" class="site-link book-link">
+                    <i class="fas fa-book-open"></i>SoBooks电子书
+                    <span class="hot-badge">热门</span>
+                </a>
+                <a href="https://bookfere.com/" class="site-link book-link">
+                    <i class="fas fa-bookmark"></i>书伴
+                </a>
+                <a href="http://neikuw.com/" class="site-link book-link">
+                    <i class="fas fa-book-reader"></i>内酷网
+                </a>
+                <a href="https://www.nmod.net/" class="site-link book-link">
+                    <i class="fas fa-crown"></i>优质电子书
+                </a>
+                <a href="http://m.bookschina.com/" class="site-link book-link">
+                    <i class="fas fa-globe-asia"></i>中国图书网
+                </a>
+                <a href="https://www2.jiumodiary.com/" class="site-link book-link">
+                    <i class="fas fa-search"></i>鸠摩搜书
+                    <span class="hot-badge">热门</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 杂志期刊 -->
+        <section class="category-card">
+            <div class="card-header magazine-bg">
+                <i class="fas fa-newspaper"></i>
+                <h2>杂志期刊</h2>
+            </div>
+            <div class="card-content">
+                <a href="http://www.50forum.org.cn/" class="site-link magazine-link">
+                    <i class="fas fa-archive"></i>过期杂志
+                </a>
+                <a href="http://www.53bk.com/baokan/" class="site-link magazine-link">
+                    <i class="fas fa-newspaper"></i>报刊资源
+                </a>
+                <a href="https://pdfzj.com/category/pdf-zazhi" class="site-link magazine-link">
+                    <i class="far fa-file-pdf"></i>PDF之家杂志
+                    <span class="hot-badge">热门</span>
+                </a>
+                <a href="https://m.fx361.com/" class="site-link magazine-link">
+                    <i class="fas fa-gavel"></i>法讯网
+                </a>
+                <a href="http://qikan.lifves.com/" class="site-link magazine-link">
+                    <i class="fas fa-book-open"></i>期刊资源
+                </a>
+            </div>
+        </section>
+
+        <!-- 实用工具 -->
+        <section class="category-card">
+            <div class="card-header tool-bg">
+                <i class="fas fa-tools"></i>
+                <h2>实用工具</h2>
+            </div>
+            <div class="card-content">
+                <a href="https://uutool.cn/" class="site-link tool-link">
+                    <i class="fas fa-toolbox"></i>UU工具
+                    <span class="hot-badge">热门</span>
+                </a>
+                <a href="https://www.yunweipai.com/" class="site-link tool-link">
+                    <i class="fas fa-server"></i>运维派
+                </a>
+            </div>
+        </section>
+
+        <!-- 娱乐视频 -->
+        <section class="category-card">
+            <div class="card-header video-bg">
+                <i class="fas fa-film"></i>
+                <h2>娱乐视频</h2>
+            </div>
+            <div class="card-content">
+                <a href="https://www.98xu.com/" class="site-link video-link">
+                    <i class="fas fa-video"></i>98短剧
+                </a>
+            </div>
+        </section>
+
+        <!-- 其他资源 -->
+        <section class="category-card">
+            <div class="card-header misc-bg">
+                <i class="fas fa-globe"></i>
+                <h2>其他资源</h2>
+            </div>
+            <div class="card-content">
+                <a href="http://www.docuchina.cn/" class="site-link misc-link">
+                    <i class="fas fa-film"></i>中国纪录片网站
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 浮生的储物袋 | 精选网址导航</p>
+    </footer>
+
+    <script>
+        // 搜索功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const siteLinks = document.querySelectorAll('.site-link');
+            const cards = document.querySelectorAll('.category-card');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                // 如果搜索框为空，显示所有卡片和链接
+                if (searchTerm === '') {
+                    siteLinks.forEach(link => link.style.display = 'flex');
+                    cards.forEach(card => card.style.display = 'block');
+                    return;
+                }
+                
+                // 隐藏所有链接，然后显示匹配的链接
+                siteLinks.forEach(link => {
+                    const linkText = link.textContent.toLowerCase();
+                    link.style.display = linkText.includes(searchTerm) ? 'flex' : 'none';
+                });
+                
+                // 隐藏没有匹配链接的卡片
+                cards.forEach(card => {
+                    const visibleLinks = card.querySelectorAll('.site-link[style="display: flex"]');
+                    card.style.display = visibleLinks.length ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+

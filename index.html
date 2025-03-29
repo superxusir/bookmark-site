@@ -25,6 +25,9 @@
             --card-shadow: 0 4px 15px rgba(0,0,0,0.1);
             --hover-shadow: 0 8px 25px rgba(0,0,0,0.15);
             --highlight-color: #ffff00;
+            --search-result-bg: white;
+            --search-result-hover: #f5f7fa;
+            --search-result-border: #eee;
         }
 
         * {
@@ -137,6 +140,73 @@
             padding: 5px 15px;
             display: inline-block;
             visibility: hidden;
+        }
+
+        /* 搜索结果容器 */
+        .search-results-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 10px;
+            background-color: var(--search-result-bg);
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* 搜索结果项 */
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--search-result-border);
+            text-decoration: none;
+            color: var(--text-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background-color: var(--search-result-hover);
+        }
+
+        .search-result-icon {
+            margin-right: 15px;
+            font-size: 18px;
+            color: var(--secondary-color);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .search-result-content {
+            flex-grow: 1;
+        }
+
+        .search-result-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .search-result-category {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-result-category span {
+            margin-left: 5px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: var(--light-bg);
+            font-size: 11px;
         }
 
         /* 快捷工具栏 */
@@ -423,6 +493,9 @@
                 padding: 10px 15px;
                 font-size: 14px;
             }
+            .search-results-container {
+                max-height: 300px;
+            }
         }
     </style>
 </head>
@@ -436,6 +509,8 @@
             <button class="search-button" id="searchButton">
                 <i class="fas fa-search"></i>
             </button>
+            <!-- 搜索结果容器 -->
+            <div class="search-results-container" id="searchResults"></div>
         </div>
         <div class="search-results-count" id="searchResultsCount"></div>
     </header>
@@ -599,85 +674,124 @@
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
             const searchResultsCount = document.getElementById('searchResultsCount');
+            const searchResults = document.getElementById('searchResults');
             const siteLinks = document.querySelectorAll('.site-link');
-            const categoryCards = document.querySelectorAll('.category-card');
             const noResultsMessage = document.getElementById('noResults');
             const resetSearchButton = document.getElementById('resetSearch');
             
-            // 为每个链接添加原始文本备份
+            // 构建站点信息数据
+            const sitesData = [];
             siteLinks.forEach(link => {
-                link.setAttribute('data-original-text', link.innerHTML);
+                const title = link.textContent.trim().replace(/热门$/, '').trim();
+                const href = link.getAttribute('href');
+                const keywords = link.getAttribute('data-keywords') || '';
+                const category = link.closest('.category-card').getAttribute('data-category');
+                const iconClass = link.querySelector('i').className;
+                const isHot = link.querySelector('.hot-badge') !== null;
+                
+                sitesData.push({
+                    title: title,
+                    href: href,
+                    keywords: keywords,
+                    category: category,
+                    iconClass: iconClass,
+                    isHot: isHot
+                });
             });
             
             // 执行搜索函数
             function performSearch() {
                 const searchTerm = searchInput.value.toLowerCase().trim();
                 
-                // 重置所有链接的文本为原始文本
-                siteLinks.forEach(link => {
-                    link.innerHTML = link.getAttribute('data-original-text');
-                });
+                // 清空搜索结果
+                searchResults.innerHTML = '';
                 
-                // 如果搜索框为空，显示所有内容
+                // 如果搜索框为空，隐藏搜索结果
                 if (searchTerm === '') {
-                    siteLinks.forEach(link => link.style.display = 'flex');
-                    categoryCards.forEach(card => card.style.display = 'block');
+                    searchResults.style.display = 'none';
                     noResultsMessage.style.display = 'none';
                     searchResultsCount.style.visibility = 'hidden';
                     return;
                 }
                 
-                let matchCount = 0;
-                let visibleCards = 0;
-                
-                // 遍历所有链接
-                siteLinks.forEach(link => {
-                    const linkText = link.textContent.toLowerCase();
-                    const keywords = (link.getAttribute('data-keywords') || '').toLowerCase();
-                    
-                    // 检查链接文本或关键词是否包含搜索词
-                    if (linkText.includes(searchTerm) || keywords.includes(searchTerm)) {
-                        // 高亮匹配文本
-                        const regex = new RegExp(searchTerm, 'gi');
-                        const originalHTML = link.getAttribute('data-original-text');
-                        const newHTML = originalHTML.replace(regex, match => {
-                            // 排除图标和徽章内的文本
-                            if (match.includes('<i') || match.includes('class="hot-badge"')) {
-                                return match;
-                            } else {
-                                return `<span class="highlight">${match}</span>`;
-                            }
-                        });
-                        
-                        link.innerHTML = newHTML;
-                        link.style.display = 'flex';
-                        matchCount++;
-                    } else {
-                        link.style.display = 'none';
-                    }
-                });
-                
-                // 处理分类卡片的显示/隐藏
-                categoryCards.forEach(card => {
-                    const visibleLinks = card.querySelectorAll('.site-link[style="display: flex"]');
-                    if (visibleLinks.length > 0) {
-                        card.style.display = 'block';
-                        visibleCards++;
-                    } else {
-                        card.style.display = 'none';
-                    }
+                // 找到匹配的站点
+                const matchingSites = sitesData.filter(site => {
+                    return site.title.toLowerCase().includes(searchTerm) || 
+                           site.keywords.toLowerCase().includes(searchTerm);
                 });
                 
                 // 显示搜索结果计数
-                searchResultsCount.textContent = `找到 ${matchCount} 个结果`;
+                searchResultsCount.textContent = `找到 ${matchingSites.length} 个结果`;
                 searchResultsCount.style.visibility = 'visible';
                 
                 // 如果没有结果，显示无结果消息
-                if (matchCount === 0) {
+                if (matchingSites.length === 0) {
+                    searchResults.style.display = 'none';
                     noResultsMessage.style.display = 'block';
-                } else {
-                    noResultsMessage.style.display = 'none';
+                    return;
                 }
+                
+                // 显示搜索结果
+                matchingSites.forEach(site => {
+                    const resultItem = document.createElement('a');
+                    resultItem.className = 'search-result-item';
+                    resultItem.href = site.href;
+                    
+                    // 创建图标
+                    const icon = document.createElement('div');
+                    icon.className = 'search-result-icon';
+                    const iconEl = document.createElement('i');
+                    iconEl.className = site.iconClass;
+                    icon.appendChild(iconEl);
+                    
+                    // 创建内容区域
+                    const content = document.createElement('div');
+                    content.className = 'search-result-content';
+                    
+                    // 创建标题并高亮匹配文本
+                    const title = document.createElement('div');
+                    title.className = 'search-result-title';
+                    const titleText = site.title;
+                    
+                    // 高亮处理
+                    if (titleText.toLowerCase().includes(searchTerm)) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        title.innerHTML = titleText.replace(regex, '<span class="highlight">$1</span>');
+                    } else {
+                        title.textContent = titleText;
+                    }
+                    
+                    // 创建分类标签
+                    const category = document.createElement('div');
+                    category.className = 'search-result-category';
+                    category.textContent = '分类: ';
+                    
+                    const categorySpan = document.createElement('span');
+                    categorySpan.textContent = site.category;
+                    category.appendChild(categorySpan);
+                    
+                    // 将元素添加到结果项
+                    content.appendChild(title);
+                    content.appendChild(category);
+                    
+                    resultItem.appendChild(icon);
+                    resultItem.appendChild(content);
+                    
+                    // 如果是热门，添加热门标签
+                    if (site.isHot) {
+                        const hotBadge = document.createElement('span');
+                        hotBadge.className = 'hot-badge';
+                        hotBadge.textContent = '热门';
+                        resultItem.appendChild(hotBadge);
+                    }
+                    
+                    // 添加到结果容器
+                    searchResults.appendChild(resultItem);
+                });
+                
+                // 显示搜索结果容器
+                searchResults.style.display = 'block';
+                noResultsMessage.style.display = 'none';
             }
             
             // 绑定搜索事件
@@ -690,10 +804,17 @@
                 }
             });
             
-            // 输入时自动搜索（可选功能，如果想要实时搜索）
+            // 输入时自动搜索
             searchInput.addEventListener('input', function() {
                 if (this.value.length >= 2 || this.value.length === 0) {
                     performSearch();
+                }
+            });
+            
+            // 点击其他地方隐藏搜索结果
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-wrapper')) {
+                    searchResults.style.display = 'none';
                 }
             });
             
@@ -708,5 +829,6 @@
     </script>
 </body>
 </html>
+
 
 

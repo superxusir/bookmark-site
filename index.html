@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5WKDXBDMGJ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -24,6 +24,7 @@
             --light-bg: #f5f7fa;
             --card-shadow: 0 4px 15px rgba(0,0,0,0.1);
             --hover-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            --highlight-color: #ffff00;
         }
 
         * {
@@ -107,13 +108,35 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
-        .search-icon {
+        .search-button {
             position: absolute;
-            right: 20px;
+            right: 5px;
             top: 50%;
             transform: translateY(-50%);
-            color: #7f8c8d;
-            font-size: 18px;
+            background: var(--secondary-color);
+            border: none;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: var(--primary-color);
+        }
+
+        .search-results-count {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 5px 15px;
+            display: inline-block;
+            visibility: hidden;
         }
 
         /* 快捷工具栏 */
@@ -234,6 +257,55 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
+        }
+
+        /* 搜索高亮 */
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.4);
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        /* 无搜索结果样式 */
+        .no-results-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            display: none;
+        }
+
+        .no-results-message i {
+            font-size: 40px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .no-results-message h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .no-results-message p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .reset-search {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .reset-search:hover {
+            background: var(--primary-color);
         }
 
         /* 分类颜色 */
@@ -361,8 +433,11 @@
         <p class="banner-subtitle">精心收藏的网络宝藏，为您的信息探索之旅提供导航</p>
         <div class="search-wrapper">
             <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索资源...">
-            <i class="fas fa-search search-icon"></i>
+            <button class="search-button" id="searchButton">
+                <i class="fas fa-search"></i>
+            </button>
         </div>
+        <div class="search-results-count" id="searchResultsCount"></div>
     </header>
 
     <!-- 快捷导航 -->
@@ -382,54 +457,62 @@
     </div>
 
     <!-- 主内容区 -->
-    <main class="container">
+    <main class="container" id="mainContainer">
+        <!-- 无搜索结果提示 -->
+        <div class="no-results-message" id="noResults">
+            <i class="fas fa-search"></i>
+            <h3>未找到相关资源</h3>
+            <p>尝试使用其他关键词，或者浏览我们的所有资源。</p>
+            <a href="#" class="reset-search" id="resetSearch">清除搜索</a>
+        </div>
+
         <!-- 学习资源 -->
-        <section class="category-card">
+        <section class="category-card" data-category="学习">
             <div class="card-header learn-bg">
                 <i class="fas fa-graduation-cap"></i>
                 <h2>学习资源</h2>
             </div>
             <div class="card-content">
-                <a href="https://www.icourses.cn/home/" class="site-link learn-link">
+                <a href="https://www.icourses.cn/home/" class="site-link learn-link" data-keywords="学习 课程 教育 视频 网课">
                     <i class="fas fa-chalkboard-teacher"></i>爱课程
                 </a>
-                <a href="https://fishc.com.cn/forum.php?mod=forumdisplay&fid=360&mobile=2" class="site-link learn-link">
+                <a href="https://fishc.com.cn/forum.php?mod=forumdisplay&fid=360&mobile=2" class="site-link learn-link" data-keywords="编程 代码 论坛 学习 python">
                     <i class="fas fa-code"></i>鱼C论坛
                 </a>
-                <a href="https://www.w3cschool.cn/sql/" class="site-link learn-link">
+                <a href="https://www.w3cschool.cn/sql/" class="site-link learn-link" data-keywords="数据库 教程 SQL 编程 开发">
                     <i class="fas fa-database"></i>W3Cschool SQL教程
                     <span class="hot-badge">热门</span>
                 </a>
-                <a href="https://le.ouchn.cn/home" class="site-link learn-link">
+                <a href="https://le.ouchn.cn/home" class="site-link learn-link" data-keywords="学习 大学 教育 课程 公开课">
                     <i class="fas fa-university"></i>国家开放大学学习网
                 </a>
             </div>
         </section>
 
         <!-- 电子书籍 -->
-        <section class="category-card">
+        <section class="category-card" data-category="书籍">
             <div class="card-header book-bg">
                 <i class="fas fa-book"></i>
                 <h2>电子书籍</h2>
             </div>
             <div class="card-content">
-                <a href="https://sobooks.cc/" class="site-link book-link">
+                <a href="https://sobooks.cc/" class="site-link book-link" data-keywords="电子书 书籍 阅读 下载 资源">
                     <i class="fas fa-book-open"></i>SoBooks电子书
                     <span class="hot-badge">热门</span>
                 </a>
-                <a href="https://bookfere.com/" class="site-link book-link">
+                <a href="https://bookfere.com/" class="site-link book-link" data-keywords="kindle 电子书 阅读器 资源">
                     <i class="fas fa-bookmark"></i>书伴
                 </a>
-                <a href="http://neikuw.com/" class="site-link book-link">
+                <a href="http://neikuw.com/" class="site-link book-link" data-keywords="电子书 免费 下载 pdf epub">
                     <i class="fas fa-book-reader"></i>内酷网
                 </a>
-                <a href="https://www.nmod.net/" class="site-link book-link">
+                <a href="https://www.nmod.net/" class="site-link book-link" data-keywords="电子书 书籍 精品 资源 网站">
                     <i class="fas fa-crown"></i>优质电子书
                 </a>
-                <a href="http://m.bookschina.com/" class="site-link book-link">
+                <a href="http://m.bookschina.com/" class="site-link book-link" data-keywords="图书 中国 书籍 购买 阅读">
                     <i class="fas fa-globe-asia"></i>中国图书网
                 </a>
-                <a href="https://www2.jiumodiary.com/" class="site-link book-link">
+                <a href="https://www2.jiumodiary.com/" class="site-link book-link" data-keywords="搜书 电子书 资源 检索 文档">
                     <i class="fas fa-search"></i>鸠摩搜书
                     <span class="hot-badge">热门</span>
                 </a>
@@ -437,69 +520,69 @@
         </section>
 
         <!-- 杂志期刊 -->
-        <section class="category-card">
+        <section class="category-card" data-category="杂志">
             <div class="card-header magazine-bg">
                 <i class="fas fa-newspaper"></i>
                 <h2>杂志期刊</h2>
             </div>
             <div class="card-content">
-                <a href="http://www.50forum.org.cn/" class="site-link magazine-link">
+                <a href="http://www.50forum.org.cn/" class="site-link magazine-link" data-keywords="过期 杂志 期刊 资源 收藏">
                     <i class="fas fa-archive"></i>过期杂志
                 </a>
-                <a href="http://www.53bk.com/baokan/" class="site-link magazine-link">
+                <a href="http://www.53bk.com/baokan/" class="site-link magazine-link" data-keywords="报刊 杂志 资源 新闻 阅读">
                     <i class="fas fa-newspaper"></i>报刊资源
                 </a>
-                <a href="https://pdfzj.com/category/pdf-zazhi" class="site-link magazine-link">
+                <a href="https://pdfzj.com/category/pdf-zazhi" class="site-link magazine-link" data-keywords="PDF 杂志 下载 电子 期刊">
                     <i class="far fa-file-pdf"></i>PDF之家杂志
                     <span class="hot-badge">热门</span>
                 </a>
-                <a href="https://m.fx361.com/" class="site-link magazine-link">
+                <a href="https://m.fx361.com/" class="site-link magazine-link" data-keywords="法律 法规 资讯 杂志 政策">
                     <i class="fas fa-gavel"></i>法讯网
                 </a>
-                <a href="http://qikan.lifves.com/" class="site-link magazine-link">
+                <a href="http://qikan.lifves.com/" class="site-link magazine-link" data-keywords="期刊 杂志 学术 资源 下载">
                     <i class="fas fa-book-open"></i>期刊资源
                 </a>
             </div>
         </section>
 
         <!-- 实用工具 -->
-        <section class="category-card">
+        <section class="category-card" data-category="工具">
             <div class="card-header tool-bg">
                 <i class="fas fa-tools"></i>
                 <h2>实用工具</h2>
             </div>
             <div class="card-content">
-                <a href="https://uutool.cn/" class="site-link tool-link">
+                <a href="https://uutool.cn/" class="site-link tool-link" data-keywords="工具 在线 实用 小工具 转换">
                     <i class="fas fa-toolbox"></i>UU工具
                     <span class="hot-badge">热门</span>
                 </a>
-                <a href="https://www.yunweipai.com/" class="site-link tool-link">
+                <a href="https://www.yunweipai.com/" class="site-link tool-link" data-keywords="运维 服务器 IT 技术 网站">
                     <i class="fas fa-server"></i>运维派
                 </a>
             </div>
         </section>
 
         <!-- 娱乐视频 -->
-        <section class="category-card">
+        <section class="category-card" data-category="视频">
             <div class="card-header video-bg">
                 <i class="fas fa-film"></i>
                 <h2>娱乐视频</h2>
             </div>
             <div class="card-content">
-                <a href="https://www.98xu.com/" class="site-link video-link">
+                <a href="https://www.98xu.com/" class="site-link video-link" data-keywords="短剧 视频 娱乐 影片 观看">
                     <i class="fas fa-video"></i>98短剧
                 </a>
             </div>
         </section>
 
         <!-- 其他资源 -->
-        <section class="category-card">
+        <section class="category-card" data-category="其他">
             <div class="card-header misc-bg">
                 <i class="fas fa-globe"></i>
                 <h2>其他资源</h2>
             </div>
             <div class="card-content">
-                <a href="http://www.docuchina.cn/" class="site-link misc-link">
+                <a href="http://www.docuchina.cn/" class="site-link misc-link" data-keywords="纪录片 中国 历史 文化 视频">
                     <i class="fas fa-film"></i>中国纪录片网站
                 </a>
             </div>
@@ -511,33 +594,115 @@
     </footer>
 
     <script>
-        // 搜索功能
         document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
             const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchResultsCount = document.getElementById('searchResultsCount');
             const siteLinks = document.querySelectorAll('.site-link');
-            const cards = document.querySelectorAll('.category-card');
+            const categoryCards = document.querySelectorAll('.category-card');
+            const noResultsMessage = document.getElementById('noResults');
+            const resetSearchButton = document.getElementById('resetSearch');
             
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
+            // 为每个链接添加原始文本备份
+            siteLinks.forEach(link => {
+                link.setAttribute('data-original-text', link.innerHTML);
+            });
+            
+            // 执行搜索函数
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
                 
-                // 如果搜索框为空，显示所有卡片和链接
+                // 重置所有链接的文本为原始文本
+                siteLinks.forEach(link => {
+                    link.innerHTML = link.getAttribute('data-original-text');
+                });
+                
+                // 如果搜索框为空，显示所有内容
                 if (searchTerm === '') {
                     siteLinks.forEach(link => link.style.display = 'flex');
-                    cards.forEach(card => card.style.display = 'block');
+                    categoryCards.forEach(card => card.style.display = 'block');
+                    noResultsMessage.style.display = 'none';
+                    searchResultsCount.style.visibility = 'hidden';
                     return;
                 }
                 
-                // 隐藏所有链接，然后显示匹配的链接
+                let matchCount = 0;
+                let visibleCards = 0;
+                
+                // 遍历所有链接
                 siteLinks.forEach(link => {
                     const linkText = link.textContent.toLowerCase();
-                    link.style.display = linkText.includes(searchTerm) ? 'flex' : 'none';
+                    const keywords = (link.getAttribute('data-keywords') || '').toLowerCase();
+                    
+                    // 检查链接文本或关键词是否包含搜索词
+                    if (linkText.includes(searchTerm) || keywords.includes(searchTerm)) {
+                        // 高亮匹配文本
+                        const regex = new RegExp(searchTerm, 'gi');
+                        const originalHTML = link.getAttribute('data-original-text');
+                        const newHTML = originalHTML.replace(regex, match => {
+                            // 排除图标和徽章内的文本
+                            if (match.includes('<i') || match.includes('class="hot-badge"')) {
+                                return match;
+                            } else {
+                                return `<span class="highlight">${match}</span>`;
+                            }
+                        });
+                        
+                        link.innerHTML = newHTML;
+                        link.style.display = 'flex';
+                        matchCount++;
+                    } else {
+                        link.style.display = 'none';
+                    }
                 });
                 
-                // 隐藏没有匹配链接的卡片
-                cards.forEach(card => {
+                // 处理分类卡片的显示/隐藏
+                categoryCards.forEach(card => {
                     const visibleLinks = card.querySelectorAll('.site-link[style="display: flex"]');
-                    card.style.display = visibleLinks.length ? 'block' : 'none';
+                    if (visibleLinks.length > 0) {
+                        card.style.display = 'block';
+                        visibleCards++;
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
+                
+                // 显示搜索结果计数
+                searchResultsCount.textContent = `找到 ${matchCount} 个结果`;
+                searchResultsCount.style.visibility = 'visible';
+                
+                // 如果没有结果，显示无结果消息
+                if (matchCount === 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+            
+            // 绑定搜索事件
+            searchButton.addEventListener('click', performSearch);
+            
+            // 绑定回车键搜索
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // 输入时自动搜索（可选功能，如果想要实时搜索）
+            searchInput.addEventListener('input', function() {
+                if (this.value.length >= 2 || this.value.length === 0) {
+                    performSearch();
+                }
+            });
+            
+            // 清除搜索
+            resetSearchButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchInput.value = '';
+                performSearch();
+                searchInput.focus();
             });
         });
     </script>
